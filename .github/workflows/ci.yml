@@ -1,8 +1,21 @@
 name: ci
 on: [pull_request]
+permissions: {}
 jobs:
   generated-files-current:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: python3 scripts/embedded_agent_kit.py build --check
+  action-verifies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: |
+          mkdir -p consumer
+          python3 scripts/embedded_agent_kit.py sync consumer --bundles core
+          cd consumer && python3 ../scripts/embedded_agent_kit.py verify . && test -f .embedded-agent-kit.json

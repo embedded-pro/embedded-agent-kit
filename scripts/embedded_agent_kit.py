@@ -116,12 +116,23 @@ def sync_agents_md(kit, repo_dir, name):
     path.write_text(BLOCK.sub(lambda _: shared_block(kit), text, count=1))
 
 
-def sync(repo_dir, repo):
+def consumer_bundles(repo_dir, requested):
+    lock = repo_dir / LOCK
+    bundles = requested or (json.loads(lock.read_text())["bundles"] if lock.exists() else None)
+    if not bundles:
+        sys.exit(f"{repo_dir}: no {LOCK}; pass --bundles for the first sync")
+    unknown = sorted(set(bundles) - set(Kit().bundles()))
+    if unknown:
+        sys.exit(f"unknown bundle(s): {', '.join(unknown)}")
+    return bundles
+
+
+def sync(repo_dir, requested, name):
     kit = Kit()
-    bundles = json.loads((ROOT / "consumers.json").read_text())[repo]
+    bundles = consumer_bundles(repo_dir, requested)
     lock = repo_dir / LOCK
     previous = set(json.loads(lock.read_text())["files"]) if lock.exists() else set()
-    sync_agents_md(kit, repo_dir, repo.split("/")[1])
+    sync_agents_md(kit, repo_dir, name or repo_dir.resolve().name)
     written = sync_skills(repo_dir, bundles)
     written = sorted(set(written) | {f for a in adapters() for f in a.sync(kit, repo_dir, bundles)})
     for stale in previous - set(written):
@@ -154,13 +165,15 @@ def main():
     sub.add_parser("build").add_argument("--check", action="store_true")
     s = sub.add_parser("sync")
     s.add_argument("repo_dir", type=pathlib.Path)
-    s.add_argument("repo")
+    s.add_argument("--bundles", type=lambda v: [b for b in v.split(",") if b],
+                   help="comma-separated bundles; default: the bundles in the consumer's lock file")
+    s.add_argument("--name", help="title for a new AGENTS.md; default: the directory name")
     sub.add_parser("verify").add_argument("repo_dir", type=pathlib.Path)
     a = parser.parse_args()
     if a.cmd == "build":
         return build(a.check)
     if a.cmd == "sync":
-        return sync(a.repo_dir, a.repo)
+        return sync(a.repo_dir, a.bundles, a.name)
     return verify(a.repo_dir)
 
 

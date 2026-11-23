@@ -1,0 +1,7 @@
+name: embedded-agent-kit verify
+description: Check that AGENTS.md carries the unedited shared block of this kit version and the repo sections.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: python3 "${GITHUB_ACTION_PATH}/scripts/embedded_agent_kit.py" verify "${GITHUB_WORKSPACE}"
