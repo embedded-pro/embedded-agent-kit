@@ -1,0 +1,8 @@
+name: ci
+on: [pull_request]
+jobs:
+  generated-files-current:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/embedded_agent_kit.py build --check
