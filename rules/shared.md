@@ -1,4 +1,4 @@
-Canonical rules for Claude, Copilot and sub-agents. Sections marked *(shared)* come from the shared agents repo:
+Canonical rules for Claude, Copilot and sub-agents. Sections marked *(shared)* come from embedded-pro/embedded-agent-kit:
 edit them there, not here. *(repo)* sections belong to this repository. *Exceptions* overrides a shared rule.
 
 ## Behaviour *(shared)*
