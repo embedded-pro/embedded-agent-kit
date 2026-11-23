@@ -1,0 +1,4 @@
+{
+  "core":    { "description": "Shared reviewer for every embedded-pro repository.", "agents": ["reviewer"], "skills": [] },
+  "toolbox": { "description": "Algorithm and unit-test skills for the numerical, robotics and neural-network toolboxes.", "agents": [], "skills": ["algo-implementer", "unit-tester"] }
+}

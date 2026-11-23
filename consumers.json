@@ -1,0 +1,15 @@
+{
+  "embedded-pro/can-lite":                  ["core"],
+  "embedded-pro/e-foc":                     ["core"],
+  "embedded-pro/e-foc-protocol":            ["core"],
+  "embedded-pro/e-psu":                     ["core"],
+  "embedded-pro/e-robot-arm":               ["core"],
+  "embedded-pro/embedded-infra-lib":        ["core"],
+  "embedded-pro/embedded-scaffold":         ["core"],
+  "embedded-pro/hal-st":                    ["core"],
+  "embedded-pro/hal-ti":                    ["core"],
+  "embedded-pro/numerical-toolbox-cpp":     ["core", "toolbox"],
+  "embedded-pro/robotics-toolbox-cpp":      ["core", "toolbox"],
+  "embedded-pro/neural-network-toobox-cpp": ["core", "toolbox"],
+  "embedded-pro/ui-cpp":                    ["core"]
+}

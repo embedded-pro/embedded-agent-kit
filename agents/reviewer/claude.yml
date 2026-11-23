@@ -1,0 +1,4 @@
+name: reviewer
+description: Review the changes on the current branch against the rules in AGENTS.md. Reports findings by severity. Does not change files.
+model: sonnet
+tools: [Read, Bash, Grep, Glob]
