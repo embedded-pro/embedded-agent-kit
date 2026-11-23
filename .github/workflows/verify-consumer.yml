@@ -1,13 +1,19 @@
+# Deprecated: consumers pin the root action (`uses: embedded-pro/embedded-agent-kit@<sha>`). Remove after all
+# consumers moved.
 name: verify-consumer
 on:
   workflow_call:
+permissions: {}
 jobs:
   agents-md:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: embedded-pro/embedded-agent-kit
           path: .embedded-agent-kit
+          persist-credentials: false
       - run: python3 .embedded-agent-kit/scripts/embedded_agent_kit.py verify .
