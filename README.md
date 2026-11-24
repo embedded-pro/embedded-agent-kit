@@ -10,10 +10,11 @@ Vendor-neutral rules, agents and skills for AI coding assistants on embedded C++
 | `skills/<name>/SKILL.md` | One skill. Synced to `.claude/skills/`, which Claude Code and Copilot both read. |
 | `bundles.json` | Agent and skill groups a consumer can enable. |
 | `action.yml` | `verify` action. Consumers pin it by commit SHA. |
+| `templates/agents.yml` | Consumer workflow that runs `verify`. `sync --ref` writes it, pinned to a release. |
 | `release-please-config.json` | Release settings. `.release-please-manifest.json` holds the last released version. |
 | `adapters/<vendor>.py` | `build` writes `dist/<vendor>/`; `sync` copies it into a consumer (`.claude/agents/`, `.github/agents/`). |
 | `dist/` | Generated. Do not edit. |
-| `scripts/embedded_agent_kit.py` | `build [--check]`, `sync <dir> [--bundles a,b] [--name N]`, `verify <dir>`. |
+| `scripts/embedded_agent_kit.py` | `build [--check]`, `sync <dir> [--bundles a,b] [--name N] [--ref SHA --tag T]`, `verify <dir>`. |
 
 Consumers get plain files, not plugins: a Claude Code plugin enabled in a repository's settings
 does not install itself and is not added in cloud sessions. Plain files work everywhere.
@@ -36,27 +37,14 @@ does not install itself and is not added in cloud sessions. Plain files work eve
 The kit keeps no list of consumers. Each consumer owns its adoption: its bundles are in its own
 `.embedded-agent-kit.json`.
 
-1. In the consumer, run `python3 <kit>/scripts/embedded_agent_kit.py sync . --bundles core` (add `toolbox` for a
-   toolbox). This writes the agents, the skills, `.embedded-agent-kit.json` and, if missing, `AGENTS.md`.
+1. In the consumer, run `python3 <kit>/scripts/embedded_agent_kit.py sync . --bundles core --ref <sha> --tag <tag>`,
+   with the commit SHA and tag of the latest kit release. Add `toolbox` for a toolbox. This writes the agents, the
+   skills, `.embedded-agent-kit.json`, `.github/workflows/agents.yml` and, if missing, `AGENTS.md`.
 2. Move its shared rules out of its AGENTS.md; keep *Domain*, *Build*, *Exceptions*.
-3. Add `.github/workflows/agents.yml`, pinned to a kit release by commit SHA:
-
-```yaml
-name: Agent Rules
-on: [pull_request]
-permissions: {}
-jobs:
-  agents-md:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: embedded-pro/embedded-agent-kit@<commit-sha> # v<version>
-```
 
 Later syncs read the bundles from `.embedded-agent-kit.json`. `sync.yml` finds every repository the sync app can
-reach that has that file, and opens one PR per consumer that also moves the action pin to the new release.
+reach that has that file, and opens one PR per consumer. That PR also rewrites `agents.yml`, pinned to the new
+release. Do not edit `agents.yml` in a consumer.
 
 ## Release
 

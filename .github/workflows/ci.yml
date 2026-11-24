@@ -17,5 +17,7 @@ jobs:
           persist-credentials: false
       - run: |
           mkdir -p consumer
-          python3 scripts/embedded_agent_kit.py sync consumer --bundles core
+          sha=$(git rev-parse HEAD)
+          python3 scripts/embedded_agent_kit.py sync consumer --bundles core --ref "${sha}" --tag v0.0.0
+          grep -qx "      - uses: embedded-pro/embedded-agent-kit@${sha} # v0.0.0" consumer/.github/workflows/agents.yml
           cd consumer && python3 ../scripts/embedded_agent_kit.py verify . && test -f .embedded-agent-kit.json
