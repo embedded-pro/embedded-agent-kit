@@ -10,6 +10,7 @@ Vendor-neutral rules, agents and skills for AI coding assistants on embedded C++
 | `skills/<name>/SKILL.md` | One skill. Synced to `.claude/skills/`, which Claude Code and Copilot both read. |
 | `bundles.json` | Agent and skill groups a consumer can enable. |
 | `action.yml` | `verify` action. Consumers pin it by commit SHA. |
+| `release-please-config.json` | Release settings. `.release-please-manifest.json` holds the last released version. |
 | `adapters/<vendor>.py` | `build` writes `dist/<vendor>/`; `sync` copies it into a consumer (`.claude/agents/`, `.github/agents/`). |
 | `dist/` | Generated. Do not edit. |
 | `scripts/embedded_agent_kit.py` | `build [--check]`, `sync <dir> [--bundles a,b] [--name N]`, `verify <dir>`. |
@@ -21,8 +22,8 @@ does not install itself and is not added in cloud sessions. Plain files work eve
 
 1. Edit `rules/`, `agents/` or `skills/`.
 2. Run `python3 scripts/embedded_agent_kit.py build`.
-3. Bump `VERSION`.
-4. Merge and publish a release. `sync.yml` opens one PR per consumer.
+3. Write Conventional Commit messages (`feat:`, `fix:`, `feat!:`). Do not edit `VERSION`.
+4. Merge the release PR (see *Release*). `sync.yml` opens one PR per consumer.
 
 ## Add a vendor
 
@@ -59,5 +60,7 @@ reach that has that file, and opens one PR per consumer that also moves the acti
 
 ## Release
 
-1. Bump `VERSION`; run `python3 scripts/embedded_agent_kit.py build`.
-2. Merge, then tag the merge commit `v<VERSION>` and publish a GitHub release for it.
+`release-please.yml` keeps a release PR open on `main`. It sets `VERSION` and `CHANGELOG.md` from the commit titles.
+Before 1.0, `feat!` and `feat` bump the minor version; `fix` bumps the patch.
+Merge the release PR: release-please tags the merge commit `v<VERSION>` and publishes the release.
+It uses the `FOREST_RELEASER_APP_ID` app, so the published release starts `sync.yml`.
