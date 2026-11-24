@@ -13,6 +13,7 @@ ADAPTERS = ["claude", "copilot"]
 LOCK = ".embedded-agent-kit.json"
 BLOCK = re.compile(r"<!-- shared:begin (\S+) sha256:(\w+) -->\n(.*?)<!-- shared:end -->\n", re.S)
 REPO_SECTIONS = ["## Domain", "## Build", "## Exceptions"]
+WORKFLOW = ".github/workflows/agents.yml"
 
 
 class Kit:
@@ -116,6 +117,14 @@ def sync_agents_md(kit, repo_dir, name):
     path.write_text(BLOCK.sub(lambda _: shared_block(kit), text, count=1))
 
 
+def sync_workflow(repo_dir, ref, tag):
+    if not re.fullmatch(r"[0-9a-f]{40}", ref):
+        sys.exit(f"--ref must be a full commit SHA, not {ref!r}")
+    text = (ROOT / "templates/agents.yml").read_text().replace("{ref}", ref).replace("{tag}", tag)
+    (repo_dir / WORKFLOW).parent.mkdir(parents=True, exist_ok=True)
+    (repo_dir / WORKFLOW).write_text(text)
+
+
 def consumer_bundles(repo_dir, requested):
     lock = repo_dir / LOCK
     bundles = requested or (json.loads(lock.read_text())["bundles"] if lock.exists() else None)
@@ -127,9 +136,11 @@ def consumer_bundles(repo_dir, requested):
     return bundles
 
 
-def sync(repo_dir, requested, name):
+def sync(repo_dir, requested, name, ref, tag):
     kit = Kit()
     bundles = consumer_bundles(repo_dir, requested)
+    if ref:
+        sync_workflow(repo_dir, ref, tag or f"v{kit.version()}")
     lock = repo_dir / LOCK
     previous = set(json.loads(lock.read_text())["files"]) if lock.exists() else set()
     sync_agents_md(kit, repo_dir, name or repo_dir.resolve().name)
@@ -168,12 +179,14 @@ def main():
     s.add_argument("--bundles", type=lambda v: [b for b in v.split(",") if b],
                    help="comma-separated bundles; default: the bundles in the consumer's lock file")
     s.add_argument("--name", help="title for a new AGENTS.md; default: the directory name")
+    s.add_argument("--ref", help=f"kit release commit SHA; writes {WORKFLOW} pinned to it")
+    s.add_argument("--tag", help="release tag for the pin comment; default: v<VERSION>")
     sub.add_parser("verify").add_argument("repo_dir", type=pathlib.Path)
     a = parser.parse_args()
     if a.cmd == "build":
         return build(a.check)
     if a.cmd == "sync":
-        return sync(a.repo_dir, a.bundles, a.name)
+        return sync(a.repo_dir, a.bundles, a.name, a.ref, a.tag)
     return verify(a.repo_dir)
 
 
