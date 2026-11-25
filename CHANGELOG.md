@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0](https://github.com/embedded-pro/embedded-agent-kit/compare/v0.5.0...v0.6.0) (2026-11-25)
+
+
+### Features
+
+* cycle and power budgets, risk-rated corner cases, one spec per PR ([5b10874](https://github.com/embedded-pro/embedded-agent-kit/commit/5b108740d6cba4f8e3974ce74e2b1e85c2f2a928))
+* Desktop tools section for logs and crash reports ([4c1f990](https://github.com/embedded-pro/embedded-agent-kit/commit/4c1f9900caa76cee1eb9047a33705a564757504e))
+* Desktop tools section for logs and crash reports ([e49d2b3](https://github.com/embedded-pro/embedded-agent-kit/commit/e49d2b32c51ecd6d872a4ef7a1cea590b016d941))
+* feature-implementer skill in the planning bundle ([dd039f2](https://github.com/embedded-pro/embedded-agent-kit/commit/dd039f250813c9d445a3677d13e8fe939e40fd5e))
+* planning bundle with roadmap-planner and feature-implementer skills ([34addc8](https://github.com/embedded-pro/embedded-agent-kit/commit/34addc82b4ac4b60e8133693e58626fb00b415dc))
+* roadmap-planner skill in a new planning bundle ([849d144](https://github.com/embedded-pro/embedded-agent-kit/commit/849d1440639446a6151ec19a2c364f1dbe903c1f))
+
 ## [0.5.0](https://github.com/embedded-pro/embedded-agent-kit/compare/v0.4.0...v0.5.0) (2026-11-24)
 
 
