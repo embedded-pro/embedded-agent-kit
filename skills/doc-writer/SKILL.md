@@ -19,6 +19,10 @@ the page layout and the checks. A repository rule in *Domain* or *Exceptions* ov
 
 Apply the content each standard asks for. Do not copy its clause structure when the template has its own.
 
+A toolbox keeps a reference library instead: one `doc/<domain>/<Name>.md` per algorithm, from its `TEMPLATE.md`.
+A reference document names the API it documents and has no front matter. *Language* and the no-Open-Questions rule
+apply to it; the design rules do not.
+
 ## Steps
 
 1. Find the document kind. Choose the folder from the table. A test strategy goes to
@@ -45,7 +49,8 @@ in `<docs>/.doc-lint-allow`. Do not add a class, function or file name to it.
 - Architecture: the deployment view names the target family. Keep part numbers in the build documentation.
 - `## Responsibilities` is the first section of a design document. It has one list. Do not add a
   "not responsible for" list. Put what the component needs from others in *Interfaces* (Required).
-- No "Open Questions", "TBD" or "Future work" section. Open an issue for an undecided item and link it.
+- No "Open Questions", "TBD" or "Future work" section. Record decisions in `## Decisions`: one row per decision
+  with the options considered, the status and the rationale. A row that is still open links its issue.
   Put a known limitation in *Constraints & Limitations*.
 - No source code. Express behaviour with Mermaid (`flowchart`, `stateDiagram-v2`, `sequenceDiagram`),
   ASCII, or the other visuals that AGENTS.md *Exceptions* allows.

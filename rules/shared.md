@@ -83,7 +83,8 @@ Scope: production code. Tests and host tools may use the heap.
 - Only an architecture document names the deployment target.
 - A design document opens with `## Responsibilities`: one list of what the component does.
   No "not responsible for" list. Put boundaries in *Interfaces* (Required).
-- No "Open Questions" section. Open an issue and link it. Put a known limitation in *Constraints & Limitations*.
+- No "Open Questions" section. Record decisions in `## Decisions`: options, status, rationale.
+  An undecided item links its issue. Put a known limitation in *Constraints & Limitations*.
 - After a documentation change, build the rendered output if the repository has a build for it.
   Check that each diagram renders and that no table column runs into the next.
 - Skill `doc-writer`, when installed: load it before you create or change a document.

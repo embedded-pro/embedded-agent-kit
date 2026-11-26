@@ -2,6 +2,8 @@
 """Check documents against the embedded-agent-kit Documentation rules.
 
 Usage: doc_lint.py <repo_dir>. Exit 1 on an error. Sentence length is a warning.
+A docs tree without kind folders (theory/, design/, ...) is a reference library: each doc/<domain>/<Name>.md gets
+the Open Questions and sentence-length checks only, since naming the API is its purpose.
 Allowed terms: one per line in <docs>/.doc-lint-allow (for example a wire-contract message name).
 """
 import pathlib
@@ -21,10 +23,15 @@ HARDWARE = re.compile(r"\b(?:STM32\w*|TM4C\w*|NUCLEO\w*|EK-\w+|ESP32\w*|nRF5\d\w
                       r"|MSP430\w*|LPC\d+\w*|i\.MX\w*|PIC\d+\w*|\d+(?:\.\d+)? ?MHz"
                       r"|(?:status|control|configuration|reset|identity|data) registers?"
                       r"|registers? (?:write|read|map|bits?))\b", re.I)
+MERMAID = re.compile(r"^```mermaid\n(sequenceDiagram.*?)^```", re.S | re.M)
+SEQ_KEYWORDS = {"loop", "link", "links", "alt", "else", "opt", "par", "and", "end", "rect", "note", "box", "critical",
+                "break", "activate", "deactivate", "autonumber", "title", "participant", "actor", "create", "destroy"}
+SEQ_ID = re.compile(r"^\s*(?:participant|actor)\s+(\w+)|^\s*(\w+)\s*-|>>\+?-?\s*(\w+)\s*:", re.M)
 OPEN_QUESTIONS = re.compile(r"^#+\s.*\bopen questions?\b", re.I | re.M)
 NOT_RESPONSIBLE = re.compile(r"\bnot responsible\b", re.I)
 MATH = re.compile(r"\$\$.*?\$\$|\$[^$]+\$", re.S)
-SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[*_(\[\"'`]*[A-Za-z])(?=[*_(\[\"'`]+|[A-Z])")
+ITEM = "\x00"  # list-item boundary: each item is measured on its own
+SENTENCE = re.compile(r"(?<=[.!?])[\"')\]*_`]*\s+(?=[*_(\[\"'`]*[A-Z]|\$)")
 
 
 def code_name(span):
@@ -53,23 +60,30 @@ def front_matter(text):
 def prose(text):
     """Text without fences, front matter, headings, tables, quotes and lists, with blank-line paragraphs."""
     text = FENCE.sub(lambda m: "\n" * m.group(0).count("\n"), text)
-    text = re.sub(r"^\$\$.*?^\$\$", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S | re.M)
+    text = re.sub(r"^[ \t]*\$\$.*\$\$[ \t]*$", "", text, flags=re.M)
+    text = re.sub(r"^[ \t]*\$\$.*?\$\$", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S | re.M)
     text = re.sub(r"\A---\n.*?\n---\n", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S)
-    return re.sub(r"^[ \t]*(?:#|\||>|[-*+]\s|\d+\.\s|<).*$", "", text, flags=re.M)
+    text = re.sub(r"^#+[ \t]+(?:References|Bibliography)\b.*?(?=^#|\Z)", lambda m: "\n" * m.group(0).count("\n"),
+                  text, flags=re.S | re.M | re.I)
+    text = re.sub(r"^[ \t]*(?:#|\||>|<|!\[).*$", "", text, flags=re.M)
+    return re.sub(r"^[ \t]*(?:[-*+]|\d+\.)[ \t]+", ITEM, text, flags=re.M)
 
 
 def long_sentences(text):
     body = prose(text)
     for paragraph in re.finditer(r"(?:[^\n]+\n?)+", body):
-        flat = MATH.sub("x", CODE_SPAN.sub("x", paragraph.group(0).replace("\n", " ")))
-        for sentence in SENTENCE.split(flat):
-            if len(sentence.split()) > MAX_WORDS:
-                yield line_of(body, paragraph.start()), len(sentence.split())
+        offset = paragraph.start()
+        for item in paragraph.group(0).split(ITEM):
+            flat = MATH.sub("x", CODE_SPAN.sub("x", item.replace("\n", " ")))
+            for sentence in SENTENCE.split(flat):
+                if len(sentence.split()) > MAX_WORDS:
+                    yield line_of(body, offset), len(sentence.split())
+            offset += len(item) + len(ITEM)
 
 
 def check(path, kind, text, allowed):
     errors, warnings = [], []
-    missing = front_matter(text)
+    missing = front_matter(text) if kind != "reference" else []
     if missing:
         errors.append((1, f"front matter misses {', '.join(missing)}"))
     for m in OPEN_QUESTIONS.finditer(text):
@@ -85,9 +99,22 @@ def check(path, kind, text, allowed):
         for m in HARDWARE.finditer(text):
             if m.group(0) not in allowed:
                 errors.append((line_of(text, m.start()), f"hardware '{m.group(0)}': say 'the target'"))
+    for block in MERMAID.finditer(text):
+        for m in SEQ_ID.finditer(block.group(1)):
+            name = next(g for g in m.groups() if g)
+            if name.lower() in SEQ_KEYWORDS:
+                at = line_of(text, block.start(1) + m.start())
+                errors.append((at, f"Mermaid participant ID '{name}' is a keyword: the diagram does not render"))
     for line, words in long_sentences(text):
         warnings.append((line, f"sentence of {words} words (ASD-STE100: <= {MAX_WORDS})"))
     return errors, warnings
+
+
+def documents(root):
+    """(kind, path) per document. A tree with no kind folders is a reference library: doc/<domain>/<Name>.md."""
+    if any((root / k).is_dir() for k in KINDS):
+        return [(k, p) for k in KINDS if (root / k).is_dir() for p in sorted((root / k).rglob("*.md"))]
+    return [("reference", p) for p in sorted(root.rglob("*.md")) if p.parent != root]
 
 
 def lint(repo_dir):
@@ -98,18 +125,17 @@ def lint(repo_dir):
     allow_file = root / ".doc-lint-allow"
     allowed = set(allow_file.read_text().split("\n")) - {""} if allow_file.exists() else set()
     n_errors = n_warnings = 0
-    for kind in KINDS:
-        for path in sorted((root / kind).rglob("*.md")) if (root / kind).is_dir() else []:
-            if path.name == "README.md":
-                continue
-            errors, warnings = check(path, kind, path.read_text(), allowed)
-            rel = path.relative_to(repo_dir)
-            for line, msg in errors:
-                print(f"{rel}:{line}: error: {msg}")
-            for line, msg in warnings:
-                print(f"{rel}:{line}: warning: {msg}")
-            n_errors += len(errors)
-            n_warnings += len(warnings)
+    for kind, path in documents(root):
+        if path.name in ("README.md", "TEMPLATE.md"):
+            continue
+        errors, warnings = check(path, kind, path.read_text(), allowed)
+        rel = path.relative_to(repo_dir)
+        for line, msg in errors:
+            print(f"{rel}:{line}: error: {msg}")
+        for line, msg in warnings:
+            print(f"{rel}:{line}: warning: {msg}")
+        n_errors += len(errors)
+        n_warnings += len(warnings)
     print(f"doc-lint: {n_errors} errors, {n_warnings} warnings")
     return 1 if n_errors else 0
 
