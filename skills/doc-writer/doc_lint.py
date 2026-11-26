@@ -26,6 +26,7 @@ HARDWARE = re.compile(r"\b(?:STM32\w*|TM4C\w*|NUCLEO\w*|EK-\w+|ESP32\w*|nRF5\d\w
 OPEN_QUESTIONS = re.compile(r"^#+\s.*\bopen questions?\b", re.I | re.M)
 NOT_RESPONSIBLE = re.compile(r"\bnot responsible\b", re.I)
 MATH = re.compile(r"\$\$.*?\$\$|\$[^$]+\$", re.S)
+ITEM = "\x00"  # list-item boundary: each item is measured on its own
 SENTENCE = re.compile(r"(?<=[.!?])[\"')\]*_`]*\s+(?=[*_(\[\"'`]*[A-Z]|\$)")
 
 
@@ -58,16 +59,20 @@ def prose(text):
     text = re.sub(r"^[ \t]*\$\$.*\$\$[ \t]*$", "", text, flags=re.M)
     text = re.sub(r"^[ \t]*\$\$.*?\$\$", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S | re.M)
     text = re.sub(r"\A---\n.*?\n---\n", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S)
-    return re.sub(r"^[ \t]*(?:#|\||>|[-*+]\s|\d+\.\s|<|!\[).*$", "", text, flags=re.M)
+    text = re.sub(r"^[ \t]*(?:#|\||>|<|!\[).*$", "", text, flags=re.M)
+    return re.sub(r"^[ \t]*(?:[-*+]|\d+\.)[ \t]+", ITEM, text, flags=re.M)
 
 
 def long_sentences(text):
     body = prose(text)
     for paragraph in re.finditer(r"(?:[^\n]+\n?)+", body):
-        flat = MATH.sub("x", CODE_SPAN.sub("x", paragraph.group(0).replace("\n", " ")))
-        for sentence in SENTENCE.split(flat):
-            if len(sentence.split()) > MAX_WORDS:
-                yield line_of(body, paragraph.start()), len(sentence.split())
+        offset = paragraph.start()
+        for item in paragraph.group(0).split(ITEM):
+            flat = MATH.sub("x", CODE_SPAN.sub("x", item.replace("\n", " ")))
+            for sentence in SENTENCE.split(flat):
+                if len(sentence.split()) > MAX_WORDS:
+                    yield line_of(body, offset), len(sentence.split())
+            offset += len(item) + len(ITEM)
 
 
 def check(path, kind, text, allowed):
