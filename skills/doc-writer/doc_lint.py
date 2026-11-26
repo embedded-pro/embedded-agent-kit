@@ -23,6 +23,10 @@ HARDWARE = re.compile(r"\b(?:STM32\w*|TM4C\w*|NUCLEO\w*|EK-\w+|ESP32\w*|nRF5\d\w
                       r"|MSP430\w*|LPC\d+\w*|i\.MX\w*|PIC\d+\w*|\d+(?:\.\d+)? ?MHz"
                       r"|(?:status|control|configuration|reset|identity|data) registers?"
                       r"|registers? (?:write|read|map|bits?))\b", re.I)
+MERMAID = re.compile(r"^```mermaid\n(sequenceDiagram.*?)^```", re.S | re.M)
+SEQ_KEYWORDS = {"loop", "link", "links", "alt", "else", "opt", "par", "and", "end", "rect", "note", "box", "critical",
+                "break", "activate", "deactivate", "autonumber", "title", "participant", "actor", "create", "destroy"}
+SEQ_ID = re.compile(r"^\s*(?:participant|actor)\s+(\w+)|^\s*(\w+)\s*-|>>\+?-?\s*(\w+)\s*:", re.M)
 OPEN_QUESTIONS = re.compile(r"^#+\s.*\bopen questions?\b", re.I | re.M)
 NOT_RESPONSIBLE = re.compile(r"\bnot responsible\b", re.I)
 MATH = re.compile(r"\$\$.*?\$\$|\$[^$]+\$", re.S)
@@ -95,6 +99,12 @@ def check(path, kind, text, allowed):
         for m in HARDWARE.finditer(text):
             if m.group(0) not in allowed:
                 errors.append((line_of(text, m.start()), f"hardware '{m.group(0)}': say 'the target'"))
+    for block in MERMAID.finditer(text):
+        for m in SEQ_ID.finditer(block.group(1)):
+            name = next(g for g in m.groups() if g)
+            if name.lower() in SEQ_KEYWORDS:
+                at = line_of(text, block.start(1) + m.start())
+                errors.append((at, f"Mermaid participant ID '{name}' is a keyword: the diagram does not render"))
     for line, words in long_sentences(text):
         warnings.append((line, f"sentence of {words} words (ASD-STE100: <= {MAX_WORDS})"))
     return errors, warnings
