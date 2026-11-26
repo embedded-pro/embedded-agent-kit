@@ -59,6 +59,8 @@ def prose(text):
     text = re.sub(r"^[ \t]*\$\$.*\$\$[ \t]*$", "", text, flags=re.M)
     text = re.sub(r"^[ \t]*\$\$.*?\$\$", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S | re.M)
     text = re.sub(r"\A---\n.*?\n---\n", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S)
+    text = re.sub(r"^#+[ \t]+(?:References|Bibliography)\b.*?(?=^#|\Z)", lambda m: "\n" * m.group(0).count("\n"),
+                  text, flags=re.S | re.M | re.I)
     text = re.sub(r"^[ \t]*(?:#|\||>|<|!\[).*$", "", text, flags=re.M)
     return re.sub(r"^[ \t]*(?:[-*+]|\d+\.)[ \t]+", ITEM, text, flags=re.M)
 
