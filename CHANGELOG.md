@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.0](https://github.com/embedded-pro/embedded-agent-kit/compare/v0.6.0...v0.7.0) (2026-11-26)
+
+
+### Features
+
+* doc_lint check for the docs bundle ([5320270](https://github.com/embedded-pro/embedded-agent-kit/commit/5320270acf1caf8074daf769c4f577e55fb5bf59))
+* documentation rules and doc-writer skill ([c48b12d](https://github.com/embedded-pro/embedded-agent-kit/commit/c48b12db43c622bf017af3e2f5751fa01f586e58))
+* documentation rules, doc-writer skill and doc_lint ([4507ed3](https://github.com/embedded-pro/embedded-agent-kit/commit/4507ed39366ae4cc8a52df5a79f720cee624184e))
+
+
+### Bug Fixes
+
+* doc_lint skips formulas and document paths ([14b264e](https://github.com/embedded-pro/embedded-agent-kit/commit/14b264e32a93cf5b8cd00268adad822b15aa9f8b))
+* doc_lint splits sentences that start with a quote or code span ([398147c](https://github.com/embedded-pro/embedded-agent-kit/commit/398147c3d83a9732ef783f7fd41d9a5e4a28fb75))
+* doc_lint splits sentences that start with emphasis or a link ([3079962](https://github.com/embedded-pro/embedded-agent-kit/commit/30799625e25525da8065e2a8efeb5fe0f6110521))
+
 ## [0.6.0](https://github.com/embedded-pro/embedded-agent-kit/compare/v0.5.0...v0.6.0) (2026-11-25)
 
 
