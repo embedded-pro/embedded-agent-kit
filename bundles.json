@@ -1,5 +1,6 @@
 {
   "core":     { "description": "Shared reviewer for every embedded-pro repository.", "agents": ["reviewer"], "skills": [] },
   "toolbox":  { "description": "Algorithm and unit-test skills for the numerical, robotics and neural-network toolboxes.", "agents": [], "skills": ["algo-implementer", "unit-tester"] },
-  "planning": { "description": "Roadmap planning and feature delivery for a new or growing embedded product.", "agents": [], "skills": ["roadmap-planner", "feature-implementer"] }
+  "planning": { "description": "Roadmap planning and feature delivery for a new or growing embedded product.", "agents": [], "skills": ["roadmap-planner", "feature-implementer"] },
+  "docs":     { "description": "Document writing: layout, standards, ASD-STE100 and render checks for repositories that publish PDFs.", "agents": [], "skills": ["doc-writer"] }
 }

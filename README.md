@@ -38,7 +38,7 @@ The kit keeps no list of consumers. Each consumer owns its adoption: its bundles
 `.embedded-agent-kit.json`.
 
 1. In the consumer, run `python3 <kit>/scripts/embedded_agent_kit.py sync . --bundles core --ref <sha> --tag <tag>`,
-   with the commit SHA and tag of the latest kit release. Add `toolbox` for a toolbox, `planning` for roadmap planning and feature delivery. This writes the agents, the
+   with the commit SHA and tag of the latest kit release. Add `toolbox` for a toolbox, `planning` for roadmap planning and feature delivery, `docs` for repositories that publish PDFs. This writes the agents, the
    skills, `.embedded-agent-kit.json`, `.github/workflows/agents.yml` and, if missing, `AGENTS.md`.
 2. Move its shared rules out of its AGENTS.md; keep *Domain*, *Build*, *Exceptions*.
 
