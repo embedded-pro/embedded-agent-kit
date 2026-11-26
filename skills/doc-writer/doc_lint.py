@@ -24,7 +24,7 @@ HARDWARE = re.compile(r"\b(?:STM32\w*|TM4C\w*|NUCLEO\w*|EK-\w+|ESP32\w*|nRF5\d\w
 OPEN_QUESTIONS = re.compile(r"^#+\s.*\bopen questions?\b", re.I | re.M)
 NOT_RESPONSIBLE = re.compile(r"\bnot responsible\b", re.I)
 MATH = re.compile(r"\$\$.*?\$\$|\$[^$]+\$", re.S)
-SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[A-Z])")
+SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[*_(\[]*[A-Z])")
 
 
 def code_name(span):
