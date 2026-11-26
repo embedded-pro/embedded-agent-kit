@@ -28,8 +28,13 @@ Apply the content each standard asks for. Do not copy its clause structure when 
 4. Write the front matter: `title`, `type`, `status`, `version`, `date`, and the fields the template adds.
 5. Write the body. Obey *Content* and *Language* below.
 6. Add the document to the index that the PDF build reads.
-7. Build the PDFs and check them with *Render check*. Fix each failure, then build again.
-8. Report changed files, build pass/fail and each render-check failure that you could not fix.
+7. Run `python3 .claude/skills/doc-writer/doc_lint.py .`. Fix each error. Shorten each sentence it warns about
+   in the text you changed. CI runs the same check (`verify` with the `docs` bundle).
+8. Build the PDFs and check them with *Render check*. Fix each failure, then build again.
+9. Report changed files, lint and build pass/fail, and each render-check failure that you could not fix.
+
+A term that the lint reports but that is correct (for example a wire-contract message name) goes on its own line
+in `<docs>/.doc-lint-allow`. Do not add a class, function or file name to it.
 
 ## Content
 

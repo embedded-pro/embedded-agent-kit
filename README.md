@@ -7,14 +7,14 @@ Vendor-neutral rules, agents and skills for AI coding assistants on embedded C++
 | `rules/shared.md` | Shared AGENTS.md sections. Synced into each consumer between `shared:begin`/`shared:end`. |
 | `rules/repo-template.md` | *Domain*, *Build*, *Exceptions* skeleton for a new consumer. |
 | `agents/<name>/` | One agent: `body.md` (vendor-neutral) and one `<vendor>.yml` header per vendor. |
-| `skills/<name>/SKILL.md` | One skill. Synced to `.claude/skills/`, which Claude Code and Copilot both read. |
+| `skills/<name>/` | One skill: `SKILL.md` and its helper files. Synced to `.claude/skills/`, which Claude Code and Copilot both read. |
 | `bundles.json` | Agent and skill groups a consumer can enable. |
 | `action.yml` | `verify` action. Consumers pin it by commit SHA. |
 | `templates/agents.yml` | Consumer workflow that runs `verify`. `sync --ref` writes it, pinned to a release. |
 | `release-please-config.json` | Release settings. `.release-please-manifest.json` holds the last released version. |
 | `adapters/<vendor>.py` | `build` writes `dist/<vendor>/`; `sync` copies it into a consumer (`.claude/agents/`, `.github/agents/`). |
 | `dist/` | Generated. Do not edit. |
-| `scripts/embedded_agent_kit.py` | `build [--check]`, `sync <dir> [--bundles a,b] [--name N] [--ref SHA --tag T]`, `verify <dir>`. |
+| `scripts/embedded_agent_kit.py` | `build [--check]`, `sync <dir> [--bundles a,b] [--name N] [--ref SHA --tag T]`, `verify <dir>` (with the `docs` bundle it also runs `skills/doc-writer/doc_lint.py`). |
 
 Consumers get plain files, not plugins: a Claude Code plugin enabled in a repository's settings
 does not install itself and is not added in cloud sessions. Plain files work everywhere.

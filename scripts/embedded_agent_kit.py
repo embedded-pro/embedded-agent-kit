@@ -72,7 +72,8 @@ def copy(source, repo_dir, target):
 
 def sync_skills(repo_dir, bundles):
     names = [s for b in bundles for s in Kit().bundles()[b]["skills"]]
-    return [copy(ROOT / f"skills/{n}/SKILL.md", repo_dir, f".claude/skills/{n}/SKILL.md") for n in names]
+    return [copy(f, repo_dir, f".claude/skills/{n}/{f.name}") for n in names
+            for f in sorted((ROOT / f"skills/{n}").iterdir()) if f.is_file()]
 
 
 def adapters():
@@ -167,7 +168,11 @@ def verify(repo_dir):
     errors += [f"missing section: {s}" for s in REPO_SECTIONS if not re.search(rf"^{re.escape(s)}\b", text, re.M)]
     for e in errors:
         print(f"AGENTS.md: {e}")
-    return 1 if errors else 0
+    lock = repo_dir / LOCK
+    docs = lock.exists() and "docs" in json.loads(lock.read_text()).get("bundles", [])
+    sys.path.insert(0, str(ROOT / "skills/doc-writer"))
+    lint = importlib.import_module("doc_lint").lint(repo_dir) if docs else 0
+    return 1 if errors or lint else 0
 
 
 def main():
