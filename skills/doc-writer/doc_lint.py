@@ -2,6 +2,8 @@
 """Check documents against the embedded-agent-kit Documentation rules.
 
 Usage: doc_lint.py <repo_dir>. Exit 1 on an error. Sentence length is a warning.
+A docs tree without kind folders (theory/, design/, ...) is a reference library: each doc/<domain>/<Name>.md gets
+the Open Questions and sentence-length checks only, since naming the API is its purpose.
 Allowed terms: one per line in <docs>/.doc-lint-allow (for example a wire-contract message name).
 """
 import pathlib
@@ -69,7 +71,7 @@ def long_sentences(text):
 
 def check(path, kind, text, allowed):
     errors, warnings = [], []
-    missing = front_matter(text)
+    missing = front_matter(text) if kind != "reference" else []
     if missing:
         errors.append((1, f"front matter misses {', '.join(missing)}"))
     for m in OPEN_QUESTIONS.finditer(text):
@@ -90,6 +92,13 @@ def check(path, kind, text, allowed):
     return errors, warnings
 
 
+def documents(root):
+    """(kind, path) per document. A tree with no kind folders is a reference library: doc/<domain>/<Name>.md."""
+    if any((root / k).is_dir() for k in KINDS):
+        return [(k, p) for k in KINDS if (root / k).is_dir() for p in sorted((root / k).rglob("*.md"))]
+    return [("reference", p) for p in sorted(root.rglob("*.md")) if p.parent != root]
+
+
 def lint(repo_dir):
     root = docs_root(repo_dir)
     if root is None:
@@ -98,18 +107,17 @@ def lint(repo_dir):
     allow_file = root / ".doc-lint-allow"
     allowed = set(allow_file.read_text().split("\n")) - {""} if allow_file.exists() else set()
     n_errors = n_warnings = 0
-    for kind in KINDS:
-        for path in sorted((root / kind).rglob("*.md")) if (root / kind).is_dir() else []:
-            if path.name == "README.md":
-                continue
-            errors, warnings = check(path, kind, path.read_text(), allowed)
-            rel = path.relative_to(repo_dir)
-            for line, msg in errors:
-                print(f"{rel}:{line}: error: {msg}")
-            for line, msg in warnings:
-                print(f"{rel}:{line}: warning: {msg}")
-            n_errors += len(errors)
-            n_warnings += len(warnings)
+    for kind, path in documents(root):
+        if path.name in ("README.md", "TEMPLATE.md"):
+            continue
+        errors, warnings = check(path, kind, path.read_text(), allowed)
+        rel = path.relative_to(repo_dir)
+        for line, msg in errors:
+            print(f"{rel}:{line}: error: {msg}")
+        for line, msg in warnings:
+            print(f"{rel}:{line}: warning: {msg}")
+        n_errors += len(errors)
+        n_warnings += len(warnings)
     print(f"doc-lint: {n_errors} errors, {n_warnings} warnings")
     return 1 if n_errors else 0
 

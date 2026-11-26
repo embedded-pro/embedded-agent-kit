@@ -19,6 +19,10 @@ the page layout and the checks. A repository rule in *Domain* or *Exceptions* ov
 
 Apply the content each standard asks for. Do not copy its clause structure when the template has its own.
 
+A toolbox keeps a reference library instead: one `doc/<domain>/<Name>.md` per algorithm, from its `TEMPLATE.md`.
+A reference document names the API it documents and has no front matter. *Language* and the no-Open-Questions rule
+apply to it; the design rules do not.
+
 ## Steps
 
 1. Find the document kind. Choose the folder from the table. A test strategy goes to
