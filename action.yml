@@ -1,5 +1,5 @@
 name: embedded-agent-kit verify
-description: Check that AGENTS.md carries the unedited shared block of this kit version and the repo sections.
+description: Check that AGENTS.md carries the unedited shared block of this kit version and the repo sections, and, with the docs bundle, lint the documents.
 runs:
   using: composite
   steps:
