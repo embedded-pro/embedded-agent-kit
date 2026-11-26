@@ -26,7 +26,7 @@ HARDWARE = re.compile(r"\b(?:STM32\w*|TM4C\w*|NUCLEO\w*|EK-\w+|ESP32\w*|nRF5\d\w
 OPEN_QUESTIONS = re.compile(r"^#+\s.*\bopen questions?\b", re.I | re.M)
 NOT_RESPONSIBLE = re.compile(r"\bnot responsible\b", re.I)
 MATH = re.compile(r"\$\$.*?\$\$|\$[^$]+\$", re.S)
-SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[*_(\[\"'`]*[A-Za-z])(?=[*_(\[\"'`]+|[A-Z])")
+SENTENCE = re.compile(r"(?<=[.!?])[\"')\]*_`]*\s+(?=[*_(\[\"'`]*[A-Z]|\$)")
 
 
 def code_name(span):
@@ -55,9 +55,10 @@ def front_matter(text):
 def prose(text):
     """Text without fences, front matter, headings, tables, quotes and lists, with blank-line paragraphs."""
     text = FENCE.sub(lambda m: "\n" * m.group(0).count("\n"), text)
-    text = re.sub(r"^\$\$.*?^\$\$", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S | re.M)
+    text = re.sub(r"^[ \t]*\$\$.*\$\$[ \t]*$", "", text, flags=re.M)
+    text = re.sub(r"^[ \t]*\$\$.*?\$\$", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S | re.M)
     text = re.sub(r"\A---\n.*?\n---\n", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S)
-    return re.sub(r"^[ \t]*(?:#|\||>|[-*+]\s|\d+\.\s|<).*$", "", text, flags=re.M)
+    return re.sub(r"^[ \t]*(?:#|\||>|[-*+]\s|\d+\.\s|<|!\[).*$", "", text, flags=re.M)
 
 
 def long_sentences(text):
