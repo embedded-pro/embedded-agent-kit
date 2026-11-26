@@ -27,6 +27,15 @@ MATH = re.compile(r"\$\$.*?\$\$|\$[^$]+\$", re.S)
 SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[A-Z])")
 
 
+def code_name(span):
+    """A code identifier or source path. A formula has spaces; a document path is not code."""
+    if re.search(r"\s", span) or span.endswith(".md"):
+        return False
+    if span.split("/")[0] in DOC_DIRS + KINDS + ["tikz", "animations", "templates"]:
+        return False
+    return bool(CODE_LIKE.search(span))
+
+
 def docs_root(repo_dir):
     return next((repo_dir / d for d in DOC_DIRS if (repo_dir / d).is_dir()), None)
 
@@ -70,7 +79,8 @@ def check(path, kind, text, allowed):
         for m in NOT_RESPONSIBLE.finditer(body):
             errors.append((line_of(text, m.start()), "'not responsible' list: state boundaries in Interfaces"))
         for m in CODE_SPAN.finditer(body):
-            if CODE_LIKE.search(m.group(1)) and m.group(1) not in allowed:
+            span = m.group(1)
+            if code_name(span) and span not in allowed:
                 errors.append((line_of(text, m.start()), f"code name `{m.group(1)}`: name the component"))
         for m in HARDWARE.finditer(text):
             if m.group(0) not in allowed:
