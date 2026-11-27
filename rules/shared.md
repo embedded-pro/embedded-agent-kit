@@ -3,7 +3,8 @@ edit them there, not here. *(repo)* sections belong to this repository. *Excepti
 
 ## Behaviour *(shared)*
 
-- **Be as terse as possible.** No preamble, summary or narration. Report file paths and pass/fail.
+- **Be as terse as possible.** No preamble or closing summary. Report file paths and pass/fail.
+  In a long task, give a one-line status when you start each new step.
 - Everything you write — code, docs, agent files, PR text — uses the fewest words that stay unambiguous.
 - Prose (docs, comments, agent files, commit and PR text) follows ASD-STE100 Simplified Technical English:
   one word, one meaning; active voice; one instruction per sentence; sentences ≤ 20 words (procedures) or ≤ 25 (descriptions).
