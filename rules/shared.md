@@ -24,6 +24,17 @@ edit them there, not here. *(repo)* sections belong to this repository. *Excepti
 8. Non-trivial change: run the `reviewer` agent, or ask the user to run it. Fix each CRITICAL and WARNING finding.
 9. Report changed files, build pass/fail, test pass/fail.
 
+## Commits & pull requests *(shared)*
+
+release-please makes the changelog and the version from these titles. It ignores a title that is not a Conventional Commit.
+
+- Write each commit title and each pull request title as a Conventional Commit: `<type>(<scope>)!: <summary>`.
+- Types: `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`, `ci`, `chore`.
+  Only `feat`, `fix` and `perf` go into the changelog.
+- Scope: the component or tool the change touches, e.g. `feat(simulator): ...`. Omit it if no single scope fits.
+- Breaking change: add `!` after the scope and a `BREAKING CHANGE:` footer.
+- Summary: imperative, sentence case, no full stop, ≤ 72 characters.
+
 ## Memory *(shared)*
 
 Scope: production code. Tests and host tools may use the heap.
