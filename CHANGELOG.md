@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.8.0](https://github.com/embedded-pro/embedded-agent-kit/compare/v0.7.0...v0.8.0) (2026-11-27)
+
+
+### Features
+
+* conventional commit rule for commit and pull request titles ([68a5b68](https://github.com/embedded-pro/embedded-agent-kit/commit/68a5b6840187d049c2f27d389ed093017cb64f87))
+* conventional commit rule for commit and pull request titles ([e7c6a2a](https://github.com/embedded-pro/embedded-agent-kit/commit/e7c6a2a0169ff47931dfc740a66ecac6afd7e90e))
+* decisions section replaces open questions ([901a9cd](https://github.com/embedded-pro/embedded-agent-kit/commit/901a9cd9774e0b36ea8439895852bd1601c5cd1c))
+* doc_lint checks toolbox reference libraries ([2f85744](https://github.com/embedded-pro/embedded-agent-kit/commit/2f85744159a8ba425f27f4c187457cd915b8ebec))
+* doc_lint flags Mermaid participant IDs that are keywords ([d89fdf5](https://github.com/embedded-pro/embedded-agent-kit/commit/d89fdf50f62d9f6c7e4b0511a3e544378e427fff))
+* doc_lint reference libraries, decisions section and sentence fixes ([89ebbf1](https://github.com/embedded-pro/embedded-agent-kit/commit/89ebbf18caec1d54502761136ad7d36159f394f0))
+
+
+### Bug Fixes
+
+* doc_lint measures list items ([df56859](https://github.com/embedded-pro/embedded-agent-kit/commit/df568598be7de6922abf6db9e68f34f4982124eb))
+* doc_lint sentence and math handling ([b04aefe](https://github.com/embedded-pro/embedded-agent-kit/commit/b04aefe72824299785876e6fed85e06e246a62e5))
+* doc_lint skips References sections ([2c086d2](https://github.com/embedded-pro/embedded-agent-kit/commit/2c086d2698bd69dee8945f5fc212e8d0eb10462a))
+
 ## [0.7.0](https://github.com/embedded-pro/embedded-agent-kit/compare/v0.6.0...v0.7.0) (2026-11-26)
 
 
